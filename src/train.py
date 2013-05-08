@@ -3,6 +3,7 @@ import numpy
 import pylab
 from sklearn.linear_model import SGDRegressor
 from sklearn import preprocessing
+from sklearn import cross_validation
 
 
 def buildXyStructures(data):
@@ -39,5 +40,7 @@ def plotPrediction(X, y, model):
 data = Data()
 X, y = buildXyStructures(data)
 X = preprocess(X)
-model = trainRegressionModel(X, y)
-plotPrediction(X, y, model)
+X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
+model = trainRegressionModel(X_train, y_train)
+#plotPrediction(X_train, y_train, model)
+print model.score(X_test, y_test)
