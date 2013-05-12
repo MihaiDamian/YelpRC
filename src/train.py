@@ -4,6 +4,7 @@ import pylab
 from sklearn.linear_model import SGDRegressor
 from sklearn import preprocessing
 from sklearn import cross_validation
+from ml_metrics import rmsle
 
 
 def buildXyStructures(data):
@@ -32,19 +33,25 @@ def trainRegressionModel(X, y):
 	return model
 
 
-def plotPrediction(X, y, model):
+def plotPrediction(X, y, prediction):
 	print "Plotting"
 	pylab.scatter(X[:,0], y, color='black')
 	#Values for the X axis need to be sorted for a meaningful prediction line
-	x_list, y_list = zip(*sorted(zip(X[:,0], model.predict(X))))
+	x_list, y_list = zip(*sorted(zip(X[:,0], prediction)))
 	pylab.plot(x_list, y_list, color='blue', linewidth=3)
 	pylab.show()
 
 
-data = Data()
-X, y = buildXyStructures(data)
-X = preprocess(X)
-X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
-model = trainRegressionModel(X_train, y_train)
-plotPrediction(X_train, y_train, model)
-#print model.score(X_test, y_test)
+def score(actual, prediction):
+	return rmsle(actual, prediction)
+
+
+if __name__ == "__main__":
+	data = Data()
+	X, y = buildXyStructures(data)
+	X = preprocess(X)
+	X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
+	model = trainRegressionModel(X, y)
+	prediction = model.predict(X_test)
+	#plotPrediction(X_test, y_test, prediction)
+	print score(y_test, prediction)
