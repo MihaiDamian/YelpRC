@@ -7,12 +7,15 @@ from sklearn import cross_validation
 
 
 def buildXyStructures(data):
-	print "Building X y matrices"
+	print "Building X y structures"
 
 	X_matrix = []
 	y_vector = []
 	for key, review in data.reviews.iteritems():
-		X_matrix.append([float(len(review['text']))])
+		text_length = float(len(review['text']))
+		X_matrix.append([text_length, text_length**2])
+		#business = data.businesses[review['business_id']]
+		#X_matrix.append([float(business['review_count'])])
 		y_vector.append(review['votes']['useful'])
 	return numpy.array(X_matrix), numpy.array(y_vector)
 
@@ -24,8 +27,7 @@ def preprocess(X):
 
 def trainRegressionModel(X, y):
 	print "Training regression model"
-
-	model = SGDRegressor(alpha=0.1, n_iter=20)
+	model = SGDRegressor(n_iter=400)
 	model.fit(X, y)
 	return model
 
@@ -33,7 +35,9 @@ def trainRegressionModel(X, y):
 def plotPrediction(X, y, model):
 	print "Plotting"
 	pylab.scatter(X[:,0], y, color='black')
-	pylab.plot(X[:,0], model.predict(X), color='blue', linewidth=3)
+	#Values for the X axis need to be sorted for a meaningful prediction line
+	x_list, y_list = zip(*sorted(zip(X[:,0], model.predict(X))))
+	pylab.plot(x_list, y_list, color='blue', linewidth=3)
 	pylab.show()
 
 
@@ -42,5 +46,5 @@ X, y = buildXyStructures(data)
 X = preprocess(X)
 X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
 model = trainRegressionModel(X_train, y_train)
-#plotPrediction(X_train, y_train, model)
-print model.score(X_test, y_test)
+plotPrediction(X_train, y_train, model)
+#print model.score(X_test, y_test)

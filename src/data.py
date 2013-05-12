@@ -1,4 +1,5 @@
-import ast
+import json
+from os import path
 
 
 class Data(object):
@@ -7,16 +8,27 @@ class Data(object):
 	def __init__(self):
 		# TODO: load the other dumps as well
 		self.reviews = {}
+		self.businesses = {}
 
 		self.__loadData()
 
 
+	def __loadDataFromFile(self, file_name, key_name):
+		print "Reading " + file_name
+
+		read_dict = {}
+		file_path = path.join('../providedData/yelp_training_set', file_name)
+		data_file = open(file_path, 'r')
+
+		for entry_string in data_file.readlines():
+			entry_dict = json.loads(entry_string)
+			entry_id = entry_dict[key_name]
+			read_dict[entry_id] = entry_dict
+
+		return read_dict
+
+
 	def __loadData(self):
 		print "Loading data dump files"
-
-		reviewsFile = open('../providedData/yelp_training_set/yelp_training_set_review.json','r')
-
-		for review_string in reviewsFile.readlines():
-			review_dict = ast.literal_eval(review_string)
-			review_id = review_dict['review_id']
-			self.reviews[review_id] = review_dict
+		self.reviews = self.__loadDataFromFile('yelp_training_set_review.json', 'review_id')
+		self.businesses = self.__loadDataFromFile('yelp_training_set_business.json', 'business_id')
