@@ -5,10 +5,13 @@ from os import path
 class Data(object):
 	"""Loads data from Yelp dumps"""
 
-	def __init__(self):
-		# TODO: load the other dumps as well
+	def __init__(self, dataset="training_set"):
+		"""
+		dataset - "training_set" or "test_set"
+		"""
 		self.reviews = {}
 		self.businesses = {}
+		self.dataset = dataset
 
 		self.__loadData()
 
@@ -17,7 +20,12 @@ class Data(object):
 		print "Reading " + file_name
 
 		read_dict = {}
-		file_path = path.join('../providedData/yelp_training_set', file_name)
+		dataset_folder = ""
+		if self.dataset is "training_set":
+			dataset_folder = "yelp_training_set"
+		elif self.dataset is "test_set":
+			dataset_folder = "yelp_test_set"
+		file_path = path.join('../providedData', dataset_folder, file_name)
 		data_file = open(file_path, 'r')
 
 		for entry_string in data_file.readlines():
@@ -30,5 +38,5 @@ class Data(object):
 
 	def __loadData(self):
 		print "Loading data dump files"
-		self.reviews = self.__loadDataFromFile('yelp_training_set_review.json', 'review_id')
-		self.businesses = self.__loadDataFromFile('yelp_training_set_business.json', 'business_id')
+		self.reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id')
+		self.businesses = self.__loadDataFromFile('yelp_set_business.json', 'business_id')
