@@ -26,9 +26,13 @@ def extractXMatrix(data):
 	X_matrix = []
 	for key, review in data.reviews.iteritems():
 		text_length = float(len(review['text']))
-		X_matrix.append([text_length, text_length**2])
-		#business = data.businesses[review['business_id']]
-		#X_matrix.append([float(business['review_count'])])
+		user_id = review['user_id']
+		user_review_count = 0.0 #this may have to be set to a mean value
+		#not all reviews have a profile
+		if user_id in data.users:
+			user = data.users[user_id]
+			user_review_count = float(user['review_count'])
+		X_matrix.append([text_length, text_length**2, user_review_count, user_review_count**2])
 	return numpy.array(X_matrix)
 
 
@@ -104,4 +108,4 @@ def predict_test_set(model, feature_scaler):
 if __name__ == "__main__":
 	feature_scaler = FeatureScaler()
 	model = train(feature_scaler)
-	predict_test_set(model, feature_scaler)
+	#predict_test_set(model, feature_scaler)

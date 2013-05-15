@@ -11,12 +11,17 @@ class Data(object):
 		"""
 		self.reviews = {}
 		self.businesses = {}
+		self.users = {}
 		self.dataset = dataset
 
 		self.__loadData()
 
 
 	def __loadDataFromFile(self, file_name, key_name):
+		"""
+		file_name - file to load from
+		key_name - field to index in dictionary by
+		"""
 		print "Reading " + file_name
 
 		read_dict = {}
@@ -40,3 +45,4 @@ class Data(object):
 		print "Loading data dump files"
 		self.reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id')
 		self.businesses = self.__loadDataFromFile('yelp_set_business.json', 'business_id')
+		self.users = self.__loadDataFromFile('yelp_set_user.json', 'user_id')
