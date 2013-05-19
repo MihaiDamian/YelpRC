@@ -85,7 +85,7 @@ def train(feature_scaler):
 	y = extractYVector(data)
 	X = feature_scaler.scaleFeatures(X)
 	X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
-	model = trainRegressionModel(X, y)
+	model = trainRegressionModel(X_train, y_train)
 	prediction = model.predict(X_test)
 	#plotPrediction(X_test, y_test, prediction)
 	print score(y_test, prediction)
