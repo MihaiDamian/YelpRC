@@ -61,7 +61,7 @@ def preprocess(X):
 
 def trainRegressionModel(X, y):
 	print "Training regression model"
-	model = SGDRegressor(n_iter=400)
+	model = SGDRegressor(n_iter=1000)
 	model.fit(X, y)
 	return model
 
