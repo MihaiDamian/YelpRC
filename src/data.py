@@ -5,6 +5,9 @@ from os import path
 class Data(object):
 	"""Loads data from Yelp dumps"""
 
+	#TODO: all datasets except reviews should be merged in a single dataset
+	#this is because of missing data in the training and test sets
+
 	def __init__(self, dataset="training_set"):
 		"""
 		dataset - "training_set" or "test_set"
