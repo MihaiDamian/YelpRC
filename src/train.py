@@ -1,111 +1,57 @@
-from data import Data
-import numpy
-import pylab
 from sklearn.linear_model import SGDRegressor
-from sklearn import preprocessing
+from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.preprocessing import StandardScaler
 from sklearn import cross_validation
-from ml_metrics import rmsle
 import csv
+from ml_metrics import rmsle
 
-
-class FeatureScaler(object):
-
-	def __init__(self):
-		self.scaler = None
-
-
-	def scaleFeatures(self, X):
-		print "Preprocessing X matrix"
-		if self.scaler is None:
-			self.scaler = preprocessing.StandardScaler().fit(X)
-		return self.scaler.transform(X)
-
-
-
-def extractXMatrix(data):
-	X_matrix = []
-	for key, review in data.reviews.iteritems():
-		text_length = float(len(review['text']))
-		user_id = review['user_id']
-		user_review_count = 0.0 #this may have to be set to a mean value
-		#not all reviews have a profile
-		if user_id in data.users:
-			user = data.users[user_id]
-			user_review_count = float(user['review_count'])
-		X_matrix.append([text_length, text_length**2, user_review_count, user_review_count**2])
-	return numpy.array(X_matrix)
-
-
-def extractYVector(data):
-	y_vector = []
-	for key, review in data.reviews.iteritems():
-		y_vector.append(review['votes']['useful'])
-	return numpy.array(y_vector)
-
-
-def extractReviewIDs(data):
-	review_ids = []
-	for key, review in data.reviews.iteritems():
-		review_ids.append(review['review_id'])
-	return review_ids
-
-
-def preprocess(X):
-	print "Preprocessing X matrix"
-	if feature_scaler is None:
-		feature_scaler = preprocessing.StandardScaler().fit(X)
-	else:
-		print "using featured scaler"
-	return feature_scaler.transform(X)
-
-
-def trainRegressionModel(X, y):
-	print "Training regression model"
-	model = SGDRegressor(n_iter=1000)
-	model.fit(X, y)
-	return model
-
-
-def plotPrediction(X, y, prediction):
-	print "Plotting"
-	pylab.scatter(X[:,0], y, color='black')
-	#Values for the X axis need to be sorted for a meaningful prediction line
-	x_list, y_list = zip(*sorted(zip(X[:,0], prediction)))
-	pylab.plot(x_list, y_list, color='blue', linewidth=3)
-	pylab.show()
+from data import Data
+from estimators import ReviewLengthEstimator
+from estimators import UnigramEstimator
+from estimators import UserReviewCountEstimator
 
 
 def score(actual, prediction):
 	return rmsle(actual, prediction)
 
 
-def train(feature_scaler):
-	data = Data("training_set")
-	X = extractXMatrix(data)
-	y = extractYVector(data)
-	X = feature_scaler.scaleFeatures(X)
-	X_train, X_test, y_train, y_test = cross_validation.train_test_split(X, y, test_size=0.4, random_state=0)
-	model = trainRegressionModel(X_train, y_train)
-	prediction = model.predict(X_test)
-	#plotPrediction(X_test, y_test, prediction)
+if __name__ == "__main__":
+	data = Data()
+	reviews = [review for key, review in data.training_reviews.iteritems()]
+	review_votes = [review['votes']['useful'] for key, review in data.training_reviews.iteritems()]
+
+	print "splitting training set"
+	X_train, X_test, y_train, y_test = cross_validation.train_test_split(reviews, review_votes, 
+													train_size=0.6, test_size=0.4, random_state=0)
+
+
+	# there is a bug in joblib that prevents us from spawning multiple jobs 
+	feature_union = FeatureUnion([#('unigram', UnigramEstimator()),
+									('user_review_count', UserReviewCountEstimator(data)),
+									('rev_length', ReviewLengthEstimator())])
+
+	pipeline = Pipeline([('features', feature_union),
+						('scale', StandardScaler()),
+						('sgdr', SGDRegressor())])
+	pipeline.set_params(sgdr__n_iter=1000, sgdr__eta0=0.00000001, 
+						sgdr__learning_rate='constant', scale__with_mean=False)
+
+	print "fitting"
+	pipeline.fit(X_train, y_train)
+	print "predicting"
+	prediction = pipeline.predict(X_test)
+	# A review can't have a negative number of votes
+	prediction = prediction.clip(0)
 	print score(y_test, prediction)
-	return model
 
 
-def predict_test_set(model, feature_scaler):
-	data = Data("test_set")
-	review_ids = extractReviewIDs(data)
-	X = extractXMatrix(data)
-	X = feature_scaler.scaleFeatures(X)
-	prediction = model.predict(X)
+	# Predict on Yelp's test set
+	"""print "predicting test set"
+	reviews = [review for key, review in data.test_reviews.iteritems()]
+	prediction = pipeline.predict(reviews)
+
 	with open('../derivedData/submission.csv','wb') as csvfile:
 		writer = csv.writer(csvfile)
-		for (p, r) in zip(prediction, review_ids):
-			writer.writerow([r, p])
-
-
-
-if __name__ == "__main__":
-	feature_scaler = FeatureScaler()
-	model = train(feature_scaler)
-	#predict_test_set(model, feature_scaler)
+		for (i, p) in enumerate(prediction):
+			review_id = reviews[i]['review_id']
+			writer.writerow([review_id, p])"""

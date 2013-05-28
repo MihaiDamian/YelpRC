@@ -5,22 +5,16 @@ from os import path
 class Data(object):
 	"""Loads data from Yelp dumps"""
 
-	#TODO: all datasets except reviews should be merged in a single dataset
-	#this is because of missing data in the training and test sets
-
-	def __init__(self, dataset="training_set"):
-		"""
-		dataset - "training_set" or "test_set"
-		"""
-		self.reviews = {}
+	def __init__(self):
+		self.training_reviews = {}
+		self.test_reviews = {}
 		self.businesses = {}
 		self.users = {}
-		self.dataset = dataset
 
 		self.__loadData()
 
 
-	def __loadDataFromFile(self, file_name, key_name):
+	def __loadDataFromFile(self, file_name, key_name, dataset_folder):
 		"""
 		file_name - file to load from
 		key_name - field to index in dictionary by
@@ -28,11 +22,6 @@ class Data(object):
 		print "Reading " + file_name
 
 		read_dict = {}
-		dataset_folder = ""
-		if self.dataset is "training_set":
-			dataset_folder = "yelp_training_set"
-		elif self.dataset is "test_set":
-			dataset_folder = "yelp_test_set"
 		file_path = path.join('../providedData', dataset_folder, file_name)
 		data_file = open(file_path, 'r')
 
@@ -46,6 +35,17 @@ class Data(object):
 
 	def __loadData(self):
 		print "Loading data dump files"
-		self.reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id')
-		self.businesses = self.__loadDataFromFile('yelp_set_business.json', 'business_id')
-		self.users = self.__loadDataFromFile('yelp_set_user.json', 'user_id')
+		self.training_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 'yelp_training_set')
+		self.test_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 'yelp_test_set')
+
+		# Only review objects need to be kept separate; the others can be merged together to fill in missing
+		# associations
+
+		# The test objects may contain less info than the training objects. For this reason the training set is
+		# loaded last to overwrite any existing objects from the test set
+
+		self.businesses = self.__loadDataFromFile('yelp_set_business.json', 'business_id', 'yelp_test_set')
+		self.businesses.update(self.__loadDataFromFile('yelp_set_business.json', 'business_id', 'yelp_training_set'))
+
+		self.users = self.__loadDataFromFile('yelp_set_user.json', 'user_id', 'yelp_test_set')
+		self.users.update(self.__loadDataFromFile('yelp_set_user.json', 'user_id', 'yelp_training_set'))
