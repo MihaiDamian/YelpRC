@@ -4,6 +4,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn import cross_validation
 import csv
 from ml_metrics import rmsle
+import pylab
+import numpy
 
 from data import Data
 from estimators import ReviewLengthEstimator
@@ -13,6 +15,17 @@ from estimators import UserReviewCountEstimator
 
 def score(actual, prediction):
 	return rmsle(actual, prediction)
+
+
+def plotPrediction(X, y, prediction):
+	print "Plotting"
+	X = numpy.array(X)[:,0]
+	pylab.scatter(X, y, color='black')
+	#Values for the X axis need to be sorted for a meaningful prediction line
+	x_list, y_list = zip(*sorted(zip(X, prediction)))
+	pylab.plot(x_list, y_list, color='blue', linewidth=3)
+	pylab.show()
+
 
 
 if __name__ == "__main__":
@@ -45,10 +58,16 @@ if __name__ == "__main__":
 	print score(y_test, prediction)
 
 
+	# sample plotting
+	"""estimator = ReviewLengthEstimator()
+	plotPrediction(estimator.transform(X_test), y_test, prediction)"""
+
+
 	# Predict on Yelp's test set
 	"""print "predicting test set"
 	reviews = [review for key, review in data.test_reviews.iteritems()]
 	prediction = pipeline.predict(reviews)
+	prediction = prediction.clip(0)
 
 	with open('../derivedData/submission.csv','wb') as csvfile:
 		writer = csv.writer(csvfile)
