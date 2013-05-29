@@ -46,8 +46,7 @@ if __name__ == "__main__":
 	pipeline = Pipeline([('features', feature_union),
 						('scale', StandardScaler()),
 						('sgdr', SGDRegressor())])
-	pipeline.set_params(sgdr__n_iter=1000, sgdr__eta0=0.00000001, 
-						sgdr__learning_rate='constant', scale__with_mean=False)
+	pipeline.set_params(sgdr__n_iter=1000, scale__with_mean=False)
 
 	print "fitting"
 	pipeline.fit(X_train, y_train)
