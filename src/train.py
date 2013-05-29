@@ -8,9 +8,7 @@ import pylab
 import numpy
 
 from data import Data
-from estimators import ReviewLengthEstimator
-from estimators import UnigramEstimator
-from estimators import UserReviewCountEstimator
+from estimators import *
 
 
 def score(actual, prediction):
@@ -39,8 +37,7 @@ if __name__ == "__main__":
 
 
 	# there is a bug in joblib that prevents us from spawning multiple jobs 
-	feature_union = FeatureUnion([#('unigram', UnigramEstimator()),
-									('user_review_count', UserReviewCountEstimator(data)),
+	feature_union = FeatureUnion([('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator())])
 
 	pipeline = Pipeline([('features', feature_union),

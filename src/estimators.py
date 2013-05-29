@@ -2,6 +2,11 @@ from sklearn.base import BaseEstimator
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
+from nltk.tokenize import sent_tokenize
+
+
+__all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
+	'SentenceCountEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -56,4 +61,17 @@ class UserReviewCountEstimator(BaseEstimator):
 				user = self.data.users[user_id]
 				user_review_count = float(user['review_count'])
 			feature_matrix.append([user_review_count, user_review_count**2])
+		return feature_matrix
+
+
+class SentenceCountEstimator(BaseEstimator):
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			sentence_count = len(sent_tokenize(review['text']))
+			feature_matrix.append([sentence_count])
 		return feature_matrix
