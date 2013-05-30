@@ -36,7 +36,8 @@ if __name__ == "__main__":
 													train_size=0.6, test_size=0.4, random_state=0)
 
 
-	# there is a bug in joblib that prevents us from spawning multiple jobs 
+	# There is a bug in joblib that prevents us from spawning multiple jobs .
+	# Paralelizing these features seems to work slower for now anyway.
 	feature_union = FeatureUnion([('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator())])
 
