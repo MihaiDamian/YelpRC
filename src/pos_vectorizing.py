@@ -29,8 +29,8 @@ def loadMatrix(filepath):
 
 def vectorize():
 	data = Data()
-	training_reviews = [review['text'] for key, review in data.training_reviews.iteritems()][:100]
-	test_reviews = [review['text'] for key, review in data.test_reviews.iteritems()][:100]
+	training_reviews = [review['text'] for key, review in data.training_reviews.iteritems()]
+	test_reviews = [review['text'] for key, review in data.test_reviews.iteritems()]
 	all_reviews = training_reviews + test_reviews
 
 	# Extract the tag counts
