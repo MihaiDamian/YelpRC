@@ -6,31 +6,22 @@ import cPickle
 from data import Data
 
 
-TRAINING_MATRIX_PATH = '../derivedData/posVectorizedTrain.pkl'
-TEST_MATRIX_PATH = '../derivedData/posVectorizedTest.pkl'
+DATA_PATH = '../derivedData/posVectorizedReviews.pkl'
 
 
-def saveMatrix(row_list, columns_count, filepath):
-	matrix = []
-	for row in row_list:
-		row = row + [0] * (columns_count - len(row))
-		matrix.append(row)
-	with open(filepath, "wb") as matrix_file:
-		cPickle.dump(matrix, matrix_file)
-
-
-def loadMatrix(filepath):
-	with open(filepath, "rb") as matrix_file:
-		matrix = cPickle.load(matrix_file)
-	for row in matrix:
-		print row
-	return matrix
+def loadData():
+	"""
+	Loads POS tag frequencies
+	"""
+	with open(DATA_PATH, "rb") as data_file:
+		data = cPickle.load(data_file)
+	return data
 
 
 def vectorize():
-	data = Data()
-	training_reviews = [review['text'] for key, review in data.training_reviews.iteritems()]
-	test_reviews = [review['text'] for key, review in data.test_reviews.iteritems()]
+	input_data = Data()
+	training_reviews = [review for key, review in input_data.training_reviews.iteritems()]
+	test_reviews = [review for key, review in input_data.test_reviews.iteritems()]
 	all_reviews = training_reviews + test_reviews
 
 	# Extract the tag counts
@@ -41,7 +32,7 @@ def vectorize():
 	for review in all_reviews:
 		# allocate zeros for all known tags; new tags will just get appended
 		row = [0] * len(tag_indexes)
-		for sentence in sent_tokenize(review):
+		for sentence in sent_tokenize(review['text']):
 			for token, tag in pos_tag(word_tokenize(sentence)):
 				if tag in tag_indexes:
 					index = tag_indexes[tag]
@@ -53,11 +44,17 @@ def vectorize():
 		row_list.append(row)
 		print "Vectorizing review " + str(len(row_list))
 
+	print "Saving data"
 	training_rows_count = len(test_reviews)
 	columns_count = len(tag_indexes)
-	print "Saving matrices"
-	saveMatrix(row_list[:training_rows_count], columns_count, TRAINING_MATRIX_PATH)
-	saveMatrix(row_list[training_rows_count:], columns_count, TEST_MATRIX_PATH)
+	output_data = {'tag_indexes':tag_indexes, 'reviews':{}}
+	# Make sure all rows have the same number of tags
+	for index, row in enumerate(row_list):
+		row = row + [0] * (columns_count - len(row))
+		review_id = all_reviews[index]['review_id']
+		output_data['reviews'][review_id] = row
+	with open(DATA_PATH, "wb") as data_file:
+		cPickle.dump(output_data, data_file)
 	
 
 if __name__ == "__main__":
