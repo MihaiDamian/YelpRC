@@ -4,9 +4,11 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
 from nltk.tokenize import sent_tokenize
 
+from pos_vectorize import loadData
+
 
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
-	'SentenceCountEstimator']
+	'SentenceCountEstimator', 'POSPipleline']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -75,3 +77,25 @@ class SentenceCountEstimator(BaseEstimator):
 			sentence_count = len(sent_tokenize(review['text']))
 			feature_matrix.append([sentence_count])
 		return feature_matrix
+
+
+class POSEstimator(BaseEstimator):
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		data = loadData()
+		feature_matrix = []
+		for review in X:
+			review_id = review['review_id']
+			feature_list = data['reviews'][review_id]
+			feature_matrix.append([float(f) for f in feature_list])
+		return feature_matrix
+
+
+class POSPipleline(Pipeline):
+
+	def __init__(self):
+		return super(POSPipleline, self).__init__([('pos', POSEstimator()), 
+													('tfidf', TfidfTransformer())])
