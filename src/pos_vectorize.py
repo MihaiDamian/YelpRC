@@ -52,7 +52,7 @@ def vectorize():
 	for index, row in enumerate(row_list):
 		row = row + [0] * (columns_count - len(row))
 		review_id = all_reviews[index]['review_id']
-		output_data['reviews'][review_id] = row
+		output_data['reviews'][review_id] = [float(f) for f in row]
 	with open(DATA_PATH, "wb") as data_file:
 		cPickle.dump(output_data, data_file)
 	

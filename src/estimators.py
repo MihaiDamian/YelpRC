@@ -82,15 +82,15 @@ class SentenceCountEstimator(BaseEstimator):
 class POSEstimator(BaseEstimator):
 
 	def fit(self, X, y):
+		self.data = loadData()
 		return self
 
 	def transform(self, X):
-		data = loadData()
 		feature_matrix = []
 		for review in X:
 			review_id = review['review_id']
-			feature_list = data['reviews'][review_id]
-			feature_matrix.append([float(f) for f in feature_list])
+			feature_list = self.data['reviews'][review_id]
+			feature_matrix.append(feature_list)
 		return feature_matrix
 
 
