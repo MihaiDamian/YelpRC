@@ -12,7 +12,7 @@ from estimators import *
 
 
 def score(actual, prediction):
-	return rmsle(actual, prediction)
+	return rmsle(actual, prediction.clip(0))
 
 
 def plotPrediction(X, y, prediction):
@@ -38,7 +38,8 @@ if __name__ == "__main__":
 
 	# There is a bug in joblib that prevents us from spawning multiple jobs.
 	# Paralelizing these features seems to work slower for now anyway.
-	feature_union = FeatureUnion([('pos', POSPipleline()),
+	feature_union = FeatureUnion([#('pos', POSPipleline()),
+									#('unigrams', UnigramEstimator()),
 									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator())
 									])
@@ -46,7 +47,7 @@ if __name__ == "__main__":
 	pipeline = Pipeline([('features', feature_union),
 						('scale', StandardScaler()),
 						('sgdr', SGDRegressor())])
-	pipeline.set_params(sgdr__n_iter=1000, scale__with_mean=False)
+	pipeline.set_params(sgdr__n_iter=1000)
 
 	print "fitting"
 	pipeline.fit(X_train, y_train)
@@ -58,18 +59,18 @@ if __name__ == "__main__":
 
 
 	# sample plotting
-	"""estimator = ReviewLengthEstimator()
-	plotPrediction(estimator.transform(X_test), y_test, prediction)"""
+	# estimator = ReviewLengthEstimator()
+	# plotPrediction(estimator.transform(X_test), y_test, prediction)
 
 
 	# Predict on Yelp's test set
-	"""print "predicting test set"
-	reviews = [review for key, review in data.test_reviews.iteritems()]
-	prediction = pipeline.predict(reviews)
-	prediction = prediction.clip(0)
+	# print "predicting test set"
+	# reviews = [review for key, review in data.test_reviews.iteritems()]
+	# prediction = pipeline.predict(reviews)
+	# prediction = prediction.clip(0)
 
-	with open('../derivedData/submission.csv','wb') as csvfile:
-		writer = csv.writer(csvfile)
-		for (i, p) in enumerate(prediction):
-			review_id = reviews[i]['review_id']
-			writer.writerow([review_id, p])"""
+	# with open('../derivedData/submission.csv','wb') as csvfile:
+	# 	writer = csv.writer(csvfile)
+	# 	for (i, p) in enumerate(prediction):
+	# 		review_id = reviews[i]['review_id']
+	# 		writer.writerow([review_id, p])

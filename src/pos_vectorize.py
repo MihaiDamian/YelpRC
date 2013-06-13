@@ -13,6 +13,7 @@ def loadData():
 	"""
 	Loads POS tag frequencies
 	"""
+	print "Loading POS vectorized reviews"
 	with open(DATA_PATH, "rb") as data_file:
 		data = cPickle.load(data_file)
 	return data
