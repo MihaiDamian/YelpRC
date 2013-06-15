@@ -40,8 +40,9 @@ if __name__ == "__main__":
 	# Paralelizing these features seems to work slower for now anyway.
 	feature_union = FeatureUnion([#('pos', POSPipleline()),
 									#('unigrams', UnigramEstimator()),
-									('user_review_count', UserReviewCountEstimator(data)),
-									('rev_length', ReviewLengthEstimator())
+									#('sentiment', SentimentEstimator()),
+									#('user_review_count', UserReviewCountEstimator(data)),
+									#('rev_length', ReviewLengthEstimator()),
 									])
 
 	pipeline = Pipeline([('features', feature_union),

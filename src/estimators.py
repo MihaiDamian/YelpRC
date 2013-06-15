@@ -6,10 +6,11 @@ from nltk.tokenize import sent_tokenize
 import numpy
 
 from pos_vectorize import loadData
+from sentimentAnalysis import SentimentClassifier
 
 
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
-	'SentenceCountEstimator', 'POSPipleline']
+	'SentenceCountEstimator', 'POSPipleline', 'SentimentEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -128,13 +129,13 @@ class POSPipleline(Pipeline):
 	',', 'CC', 'CD', 'DT', 'IN', 'MD', 'NNS', 'PRP', 'PRP$', 'RP', 'TO', 'VB', 'VBD', 'VBG', 'WRB'
 	"""
 
-	_pos_data = None
+	__pos_data = None
 
 	@classmethod
 	def pos_data(cls):
-		if cls._pos_data is None:
-			cls._pos_data = loadData()
-		return cls._pos_data
+		if cls.__pos_data is None:
+			cls.__pos_data = loadData()
+		return cls.__pos_data
 
 
 	def __init__(self):
@@ -143,3 +144,26 @@ class POSPipleline(Pipeline):
 											('pos_select', POSSelector())])
 		self.set_params(pos__pos_data=POSPipleline.pos_data(), 
 						pos_select__pos_data=POSPipleline.pos_data())
+
+
+class SentimentEstimator(BaseEstimator):
+
+	__classifier = None
+
+	@classmethod
+	def classifier(cls):
+		if cls.__classifier is None:
+			cls.__classifier = SentimentClassifier()
+		return cls.__classifier
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			classification = self.classifier().classify(review['text'])
+			score = -classification[0][1] + classification[1][1]
+			row = [score, score**2]
+			feature_matrix.append(row)
+		return feature_matrix
