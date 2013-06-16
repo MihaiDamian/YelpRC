@@ -41,8 +41,9 @@ if __name__ == "__main__":
 	feature_union = FeatureUnion([#('pos', POSPipleline()),
 									#('unigrams', UnigramEstimator()),
 									#('sentiment', SentimentEstimator()),
-									#('user_review_count', UserReviewCountEstimator(data)),
-									#('rev_length', ReviewLengthEstimator()),
+									#('review_count', BusinessReviewCountEstimator()),
+									('user_review_count', UserReviewCountEstimator(data)),
+									('rev_length', ReviewLengthEstimator()),
 									])
 
 	pipeline = Pipeline([('features', feature_union),

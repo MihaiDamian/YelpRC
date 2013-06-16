@@ -10,7 +10,7 @@ from sentimentAnalysis import SentimentClassifier
 
 
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
-	'SentenceCountEstimator', 'POSPipleline', 'SentimentEstimator']
+	'SentenceCountEstimator', 'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -166,4 +166,21 @@ class SentimentEstimator(BaseEstimator):
 			score = -classification[0][1] + classification[1][1]
 			row = [score, score**2]
 			feature_matrix.append(row)
+		return feature_matrix
+
+
+class BusinessReviewCountEstimator(BaseEstimator):
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			business = self.data.get_business_for_review(review)
+			count = float(business['review_count'])
+			feature_matrix.append([count])
 		return feature_matrix

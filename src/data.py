@@ -35,17 +35,26 @@ class Data(object):
 
 	def __loadData(self):
 		print "Loading data dump files"
-		self.training_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 'yelp_training_set')
-		self.test_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 'yelp_test_set')
+		self.training_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 
+														'yelp_training_set')
+		self.test_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 
+														'yelp_test_set')
 
-		# Only review objects need to be kept separate; the others can be merged together to fill in missing
-		# associations
+		# Only review objects need to be kept separate; the others can be merged together to fill in 
+		# missing associations
 
-		# The test objects may contain less info than the training objects. For this reason the training set is
-		# loaded last to overwrite any existing objects from the test set
+		# The test objects may contain less info than the training objects. For this reason the 
+		# training set is loaded last to overwrite any existing objects from the test set
 
-		self.businesses = self.__loadDataFromFile('yelp_set_business.json', 'business_id', 'yelp_test_set')
-		self.businesses.update(self.__loadDataFromFile('yelp_set_business.json', 'business_id', 'yelp_training_set'))
+		self.businesses = self.__loadDataFromFile('yelp_set_business.json', 'business_id', 
+													'yelp_test_set')
+		self.businesses.update(self.__loadDataFromFile('yelp_set_business.json', 'business_id', 
+														'yelp_training_set'))
 
 		self.users = self.__loadDataFromFile('yelp_set_user.json', 'user_id', 'yelp_test_set')
-		self.users.update(self.__loadDataFromFile('yelp_set_user.json', 'user_id', 'yelp_training_set'))
+		self.users.update(self.__loadDataFromFile('yelp_set_user.json', 'user_id', 
+													'yelp_training_set'))
+
+
+	def get_business_for_review(self, review):
+		return self.businesses[review['business_id']]
