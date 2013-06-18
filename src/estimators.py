@@ -2,7 +2,7 @@ from sklearn.base import BaseEstimator
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
-from nltk.tokenize import sent_tokenize
+from nltk.tokenize import sent_tokenize, word_tokenize
 import numpy
 from scipy.stats import cmedian, tmean
 from collections import defaultdict
@@ -12,8 +12,8 @@ from sentimentAnalysis import SentimentClassifier
 
 
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
-	'SentenceCountEstimator', 'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator',
-	'WinnerBiasEstimator']
+	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'POSPipleline', 
+	'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -84,6 +84,24 @@ class SentenceCountEstimator(BaseEstimator):
 		for review in X:
 			sentence_count = len(sent_tokenize(review['text']))
 			feature_matrix.append([sentence_count])
+		return feature_matrix
+
+
+class AverageSentenceLengthEstimator(BaseEstimator):
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			words_count = 0
+			sentence_count = 0
+			for sentence in sent_tokenize(review['text']):
+				words_count += len(word_tokenize(sentence))
+				sentence_count += 1
+			average_length = words_count / float(sentence_count)
+			feature_matrix.append([average_length, average_length**2])
 		return feature_matrix
 
 

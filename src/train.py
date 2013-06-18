@@ -38,14 +38,9 @@ if __name__ == "__main__":
 
 	# There is a bug in joblib that prevents us from spawning multiple jobs.
 	# Paralelizing these features seems to work slower for now anyway.
-	feature_union = FeatureUnion([#('pos', POSPipleline()),
-									#('unigrams', UnigramEstimator()),
-									#('sentiment', SentimentEstimator()),
-									#('review_count', BusinessReviewCountEstimator()),
-									('user_review_count', UserReviewCountEstimator(data)),
+	feature_union = FeatureUnion([('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
 									])
-	feature_union.set_params(winner_bias__data=data)
 
 	pipeline = Pipeline([('features', feature_union),
 						('scale', StandardScaler()),
