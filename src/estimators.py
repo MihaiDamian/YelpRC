@@ -4,13 +4,16 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
 from nltk.tokenize import sent_tokenize
 import numpy
+from scipy.stats import cmedian, tmean
+from collections import defaultdict
 
 from pos_vectorize import loadData
 from sentimentAnalysis import SentimentClassifier
 
 
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
-	'SentenceCountEstimator', 'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator']
+	'SentenceCountEstimator', 'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator',
+	'WinnerBiasEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -183,4 +186,34 @@ class BusinessReviewCountEstimator(BaseEstimator):
 			business = self.data.get_business_for_review(review)
 			count = float(business['review_count'])
 			feature_matrix.append([count])
+		return feature_matrix
+
+
+class WinnerBiasEstimator(BaseEstimator):
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def fit(self, X, y):
+		self.business_winner_bias = {}
+		business_review_votes = defaultdict(list)
+		for review in self.data.training_reviews.values():
+			business_review_votes[review['business_id']].append(review['votes']['useful'])
+		for business_id, review_votes in business_review_votes.iteritems():
+			median = cmedian(review_votes)
+			mean = tmean(review_votes)
+			if len(review_votes) > 0 and mean != 0:
+				bias = median / mean
+			else:
+				bias = 1
+			self.business_winner_bias[business_id] = bias
+
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			business_id = self.data.get_business_for_review(review)['business_id']
+			bias = self.business_winner_bias[business_id]
+			feature_matrix.append([bias, bias**2, bias**3])
 		return feature_matrix

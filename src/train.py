@@ -42,9 +42,11 @@ if __name__ == "__main__":
 									#('unigrams', UnigramEstimator()),
 									#('sentiment', SentimentEstimator()),
 									#('review_count', BusinessReviewCountEstimator()),
+									('winner_bias', WinnerBiasEstimator()),
 									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
 									])
+	feature_union.set_params(winner_bias__data=data)
 
 	pipeline = Pipeline([('features', feature_union),
 						('scale', StandardScaler()),
