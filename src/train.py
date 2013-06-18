@@ -42,7 +42,6 @@ if __name__ == "__main__":
 									#('unigrams', UnigramEstimator()),
 									#('sentiment', SentimentEstimator()),
 									#('review_count', BusinessReviewCountEstimator()),
-									('winner_bias', WinnerBiasEstimator()),
 									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
 									])
