@@ -38,7 +38,9 @@ if __name__ == "__main__":
 
 	# There is a bug in joblib that prevents us from spawning multiple jobs.
 	# Paralelizing these features seems to work slower for now anyway.
-	feature_union = FeatureUnion([('user_review_count', UserReviewCountEstimator(data)),
+	feature_union = FeatureUnion([
+									('paragraphs_count', ParagraphCountEstimator()),
+									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
 									])
 

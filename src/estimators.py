@@ -12,8 +12,8 @@ from sentimentAnalysis import SentimentClassifier
 
 
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
-	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'POSPipleline', 
-	'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator']
+	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'ParagraphCountEstimator',
+	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -102,6 +102,19 @@ class AverageSentenceLengthEstimator(BaseEstimator):
 				sentence_count += 1
 			average_length = words_count / float(sentence_count)
 			feature_matrix.append([average_length, average_length**2])
+		return feature_matrix
+
+
+class ParagraphCountEstimator(BaseEstimator):
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			paragraphs = float(len(review['text'].splitlines()))
+			feature_matrix.append([paragraphs])
 		return feature_matrix
 
 
