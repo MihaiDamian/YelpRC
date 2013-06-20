@@ -40,6 +40,12 @@ class Data(object):
 		self.test_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 
 														'yelp_test_set')
 
+		# inject snapshot dates (these were communicated on the competition site)
+		for review in self.training_reviews.values():
+			review['snapshot_date'] = "2013-01-19"
+		for review in self.test_reviews.values():
+			review['snapshot_date'] = "2013-03-12"
+
 		# Only review objects need to be kept separate; the others can be merged together to fill in 
 		# missing associations
 

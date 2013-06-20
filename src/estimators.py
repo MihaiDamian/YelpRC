@@ -6,6 +6,7 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 import numpy
 from scipy.stats import cmedian, tmean
 from collections import defaultdict
+import datetime
 
 from pos_vectorize import loadData
 from sentimentAnalysis import SentimentClassifier
@@ -13,7 +14,8 @@ from sentimentAnalysis import SentimentClassifier
 
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
 	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'ParagraphCountEstimator',
-	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator']
+	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
+	'ReviewAgeEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -247,4 +249,20 @@ class WinnerBiasEstimator(BaseEstimator):
 			business_id = self.data.get_business_for_review(review)['business_id']
 			bias = self.business_winner_bias[business_id]
 			feature_matrix.append([bias, bias**2, bias**3])
+		return feature_matrix
+
+
+class ReviewAgeEstimator(BaseEstimator):
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			date_format = '%Y-%m-%d'
+			draft_date = datetime.datetime.strptime(review['date'], date_format)
+			snapshot_date = datetime.datetime.strptime(review['snapshot_date'], date_format)
+			time_delta = float((snapshot_date - draft_date).days)
+			feature_matrix.append([time_delta])
 		return feature_matrix
