@@ -2,6 +2,7 @@ from sklearn.base import BaseEstimator
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import LabelBinarizer
 from nltk.tokenize import sent_tokenize, word_tokenize
 import numpy
 from scipy.stats import cmedian, tmean
@@ -15,7 +16,8 @@ from sentimentAnalysis import SentimentClassifier
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
 	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'ParagraphCountEstimator',
 	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
-	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator']
+	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator', 
+	'BusinessCategoriesEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -304,3 +306,31 @@ class CheckinsCountEstimator(BaseEstimator):
 				checkins_count = float(sum(checkins['checkin_info'].values()))
 			feature_matrix.append([checkins_count])
 		return feature_matrix
+
+
+class BusinessCategoriesEstimator(BaseEstimator):
+	"""
+	WARNING
+	Works only with a modified version of LabelBinarizer
+	"""
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def __create_labels_list(self, review_list):
+		labels = []
+		for review in review_list:
+			business = self.data.get_business_for_review(review)
+			labels.append(business['categories'])
+		return labels
+
+	def fit(self, X, y):
+		self.binarizer = LabelBinarizer()
+		labels = self.__create_labels_list(X)
+		self.binarizer.fit(labels)
+		return self
+
+	def transform(self, X):
+		labels = self.__create_labels_list(X)
+		binarized_labels = self.binarizer.transform(labels)
+		return binarized_labels.astype(float)
