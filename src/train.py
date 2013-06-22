@@ -44,7 +44,6 @@ if __name__ == "__main__":
 									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
 									])
-	feature_union.set_params(checkins_count__data=data)
 
 	pipeline = Pipeline([('features', feature_union),
 						('scale', StandardScaler()),
