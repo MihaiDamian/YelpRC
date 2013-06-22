@@ -15,7 +15,7 @@ def score(actual, prediction):
 	return rmsle(actual, prediction.clip(0))
 
 
-def plotPrediction(X, y, prediction):
+def plot_prediction(X, y, prediction):
 	print "Plotting"
 	X = numpy.array(X)[:,0]
 	pylab.scatter(X, y, color='black')
@@ -44,6 +44,7 @@ if __name__ == "__main__":
 									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
 									])
+	feature_union.set_params(checkins_count__data=data)
 
 	pipeline = Pipeline([('features', feature_union),
 						('scale', StandardScaler()),
@@ -61,17 +62,17 @@ if __name__ == "__main__":
 
 	# sample plotting
 	# estimator = ReviewLengthEstimator()
-	# plotPrediction(estimator.transform(X_test), y_test, prediction)
+	# plot_prediction(estimator.transform(X_test), y_test, prediction)
 
 
 	# Predict on Yelp's test set
-	print "predicting test set"
-	reviews = [review for key, review in data.test_reviews.iteritems()]
-	prediction = pipeline.predict(reviews)
-	prediction = prediction.clip(0)
+	# print "predicting test set"
+	# reviews = [review for key, review in data.test_reviews.iteritems()]
+	# prediction = pipeline.predict(reviews)
+	# prediction = prediction.clip(0)
 
-	with open('../derivedData/submission.csv','wb') as csvfile:
-		writer = csv.writer(csvfile)
-		for (i, p) in enumerate(prediction):
-			review_id = reviews[i]['review_id']
-			writer.writerow([review_id, p])
+	# with open('../derivedData/submission.csv','wb') as csvfile:
+	# 	writer = csv.writer(csvfile)
+	# 	for (i, p) in enumerate(prediction):
+	# 		review_id = reviews[i]['review_id']
+	# 		writer.writerow([review_id, p])

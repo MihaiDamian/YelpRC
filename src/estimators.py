@@ -15,7 +15,7 @@ from sentimentAnalysis import SentimentClassifier
 __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
 	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'ParagraphCountEstimator',
 	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
-	'ReviewAgeEstimator', 'AverageParagraphLength']
+	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -282,4 +282,25 @@ class ReviewAgeEstimator(BaseEstimator):
 			snapshot_date = datetime.datetime.strptime(review['snapshot_date'], date_format)
 			time_delta = float((snapshot_date - draft_date).days)
 			feature_matrix.append([time_delta])
+		return feature_matrix
+
+
+class CheckinsCountEstimator(BaseEstimator):
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			business = self.data.get_business_for_review(review)
+			business_id = business['business_id']
+			checkins_count = 0
+			if business_id in self.data.training_checkins:
+				checkins = self.data.training_checkins[business_id]
+				checkins_count = float(sum(checkins['checkin_info'].values()))
+			feature_matrix.append([checkins_count])
 		return feature_matrix

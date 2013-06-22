@@ -14,7 +14,7 @@ class Data(object):
 		self.__loadData()
 
 
-	def __loadDataFromFile(self, file_name, key_name, dataset_folder):
+	def __load_to_dictionary(self, file_name, key_name, dataset_folder):
 		"""
 		file_name - file to load from
 		key_name - field to index in dictionary by
@@ -35,9 +35,9 @@ class Data(object):
 
 	def __loadData(self):
 		print "Loading data dump files"
-		self.training_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 
+		self.training_reviews = self.__load_to_dictionary('yelp_set_review.json', 'review_id', 
 														'yelp_training_set')
-		self.test_reviews = self.__loadDataFromFile('yelp_set_review.json', 'review_id', 
+		self.test_reviews = self.__load_to_dictionary('yelp_set_review.json', 'review_id', 
 														'yelp_test_set')
 
 		# inject snapshot dates (these were communicated on the competition site)
@@ -52,14 +52,19 @@ class Data(object):
 		# The test objects may contain less info than the training objects. For this reason the 
 		# training set is loaded last to overwrite any existing objects from the test set
 
-		self.businesses = self.__loadDataFromFile('yelp_set_business.json', 'business_id', 
+		self.businesses = self.__load_to_dictionary('yelp_set_business.json', 'business_id', 
 													'yelp_test_set')
-		self.businesses.update(self.__loadDataFromFile('yelp_set_business.json', 'business_id', 
+		self.businesses.update(self.__load_to_dictionary('yelp_set_business.json', 'business_id', 
 														'yelp_training_set'))
 
-		self.users = self.__loadDataFromFile('yelp_set_user.json', 'user_id', 'yelp_test_set')
-		self.users.update(self.__loadDataFromFile('yelp_set_user.json', 'user_id', 
+		self.users = self.__load_to_dictionary('yelp_set_user.json', 'user_id', 'yelp_test_set')
+		self.users.update(self.__load_to_dictionary('yelp_set_user.json', 'user_id', 
 													'yelp_training_set'))
+
+		self.training_checkins = self.__load_to_dictionary('yelp_set_checkin.json', 'business_id', 
+													'yelp_training_set')
+		self.test_checkins = self.__load_to_dictionary('yelp_set_checkin.json', 'business_id',
+														 'yelp_test_set')
 
 
 	def get_business_for_review(self, review):
