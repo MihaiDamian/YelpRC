@@ -7,7 +7,6 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 import numpy
 from scipy.stats import cmedian, tmean
 from collections import defaultdict
-import datetime
 
 from pos_vectorize import loadData
 from sentimentAnalysis import SentimentClassifier
@@ -279,9 +278,8 @@ class ReviewAgeEstimator(BaseEstimator):
 	def transform(self, X):
 		feature_matrix = []
 		for review in X:
-			date_format = '%Y-%m-%d'
-			draft_date = datetime.datetime.strptime(review['date'], date_format)
-			snapshot_date = datetime.datetime.strptime(review['snapshot_date'], date_format)
+			draft_date = review['date']
+			snapshot_date = review['snapshot_date']
 			time_delta = float((snapshot_date - draft_date).days)
 			feature_matrix.append([time_delta])
 		return feature_matrix
