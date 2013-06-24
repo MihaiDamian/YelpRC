@@ -258,14 +258,17 @@ class WinnerBiasEstimator(BaseEstimator):
 			else:
 				bias = 1
 			self.business_winner_bias[business_id] = bias
-
+			
 		return self
 
 	def transform(self, X):
 		feature_matrix = []
 		for review in X:
 			business_id = self.data.get_business_for_review(review)['business_id']
-			bias = self.business_winner_bias[business_id]
+			if business_id in self.business_winner_bias:
+				bias = self.business_winner_bias[business_id]
+			else:
+				bias = 1
 			feature_matrix.append([bias, bias**2, bias**3])
 		return feature_matrix
 
