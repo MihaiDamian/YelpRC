@@ -16,7 +16,7 @@ __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimato
 	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'ParagraphCountEstimator',
 	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
 	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator', 
-	'BusinessCategoriesEstimator', 'TimeCompetitionEstimator']
+	'BusinessCategoriesEstimator', 'TimeCompetitionEstimator', 'UserUsefulVotesEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -367,4 +367,25 @@ class TimeCompetitionEstimator(BaseEstimator):
 				distance = 0
 
 			feature_matrix.append([distance, distance**2])
+		return feature_matrix
+
+
+class UserUsefulVotesEstimator(BaseEstimator):
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			user_id = review['user_id']
+			votes = 0.0
+			if user_id in self.data.users:
+				user = self.data.users[review['user_id']]
+				if 'votes' in user:
+					votes = float(user['votes']['useful'])
+			feature_matrix.append([votes, votes**2, votes**3])
 		return feature_matrix
