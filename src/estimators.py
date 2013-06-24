@@ -16,7 +16,7 @@ __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimato
 	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'ParagraphCountEstimator',
 	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
 	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator', 
-	'BusinessCategoriesEstimator']
+	'BusinessCategoriesEstimator', 'TimeCompetitionEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -332,3 +332,36 @@ class BusinessCategoriesEstimator(BaseEstimator):
 		labels = self.__create_labels_list(X)
 		binarized_labels = self.binarizer.transform(labels)
 		return binarized_labels.astype(float)
+
+
+class TimeCompetitionEstimator(BaseEstimator):
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def fit(self, X, y):
+		return self
+
+	def __reviews_indexed_by_business(self):
+		reviews_dict = defaultdict(list)
+		all_reviews = self.data.training_reviews.values() + self.data.test_reviews.values()
+		for review in all_reviews:
+			business_id = review['business_id']
+			reviews_dict[business_id].append(review)
+		return reviews_dict
+
+	def transform(self, X):
+		feature_matrix = []
+		business_indexed_reviews = self.__reviews_indexed_by_business()
+		for review in X:
+			business = self.data.get_business_for_review(review)
+			business_reviews = business_indexed_reviews[business['business_id']]
+
+			dates = [r['date'] for r in business_reviews if r['review_id'] != review['review_id']]
+			if len(dates) > 0:
+				distance = float(min([(date - review['date']).days for date in dates]))
+			else:
+				distance = 0
+
+			feature_matrix.append([distance, distance**2])
+		return feature_matrix
