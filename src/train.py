@@ -39,13 +39,12 @@ if __name__ == "__main__":
 	# There is a bug in joblib that prevents us from spawning multiple jobs.
 	# Paralelizing these features seems to work slower for now anyway.
 	feature_union = FeatureUnion([
-									('user_useful_votes', UserUsefulVotesEstimator()),
+									('user_useful_votes', UserUsefulVotesEstimator(data)),
 									('review_age', ReviewAgeEstimator()),
 									('paragraphs_count', ParagraphCountEstimator()),
 									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
 									])
-	feature_union.set_params(user_useful_votes__data=data)
 
 	pipeline = Pipeline([('features', feature_union),
 						('scale', StandardScaler()),
