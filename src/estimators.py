@@ -17,7 +17,7 @@ __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimato
 	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
 	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator', 
 	'BusinessCategoriesEstimator', 'TimeCompetitionEstimator', 'UserUsefulVotesEstimator',
-	'UserFunnyVotesEstimator', 'UserCoolVotesEstimator']
+	'UserFunnyVotesEstimator', 'UserCoolVotesEstimator', 'PunctuationEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -431,4 +431,22 @@ class UserCoolVotesEstimator(BaseEstimator):
 				if 'votes' in user:
 					votes = float(user['votes']['cool'])
 			feature_matrix.append([votes, votes**2])
+		return feature_matrix
+
+
+class PunctuationEstimator(BaseEstimator):
+
+	def __init__(self, sign=None):
+		self.sign = sign
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			text = review['text']
+			sign_count = text.count(self.sign)
+			score = float(sign_count) / (len(text) + 1)
+			feature_matrix.append([score])
 		return feature_matrix

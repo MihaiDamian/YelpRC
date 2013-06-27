@@ -46,6 +46,8 @@ if __name__ == "__main__":
 									('paragraphs_count', ParagraphCountEstimator()),
 									('user_review_count', UserReviewCountEstimator(data)),
 									('rev_length', ReviewLengthEstimator()),
+									('exclamations', PunctuationEstimator('!')),
+									('questions', PunctuationEstimator('?')),
 									])
 
 	pipeline = Pipeline([('features', feature_union),
