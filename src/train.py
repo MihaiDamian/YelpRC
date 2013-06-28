@@ -77,6 +77,7 @@ if __name__ == "__main__":
 
 	# with open('../derivedData/submission.csv','wb') as csvfile:
 	# 	writer = csv.writer(csvfile)
+	# 	writer.writerow(['Id', 'Votes'])
 	# 	for (i, p) in enumerate(prediction):
 	# 		review_id = reviews[i]['review_id']
 	# 		writer.writerow([review_id, p])
