@@ -17,7 +17,8 @@ __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimato
 	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
 	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator', 
 	'BusinessCategoriesEstimator', 'TimeCompetitionEstimator', 'UserUsefulVotesEstimator',
-	'UserFunnyVotesEstimator', 'UserCoolVotesEstimator', 'PunctuationEstimator']
+	'UserFunnyVotesEstimator', 'UserCoolVotesEstimator', 'PunctuationEstimator',
+	'BusinessOpenEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -449,4 +450,21 @@ class PunctuationEstimator(BaseEstimator):
 			sign_count = text.count(self.sign)
 			score = float(sign_count) / (len(text) + 1)
 			feature_matrix.append([score])
+		return feature_matrix
+
+
+class BusinessOpenEstimator(BaseEstimator):
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def fit(self, X, y):
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			business = self.data.get_business_for_review(review)
+			feature = float(business['open'])
+			feature_matrix.append([feature])
 		return feature_matrix
