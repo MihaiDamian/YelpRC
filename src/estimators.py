@@ -6,7 +6,7 @@ from sklearn.preprocessing import LabelBinarizer
 from nltk.tokenize import sent_tokenize, word_tokenize
 import numpy
 from scipy.stats import cmedian, tmean
-from collections import defaultdict
+from collections import defaultdict, Counter
 
 from pos_vectorize import loadData
 from sentimentAnalysis import SentimentClassifier
@@ -18,7 +18,7 @@ __all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimato
 	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator', 
 	'BusinessCategoriesEstimator', 'TimeCompetitionEstimator', 'UserUsefulVotesEstimator',
 	'UserFunnyVotesEstimator', 'UserCoolVotesEstimator', 'PunctuationEstimator',
-	'BusinessOpenEstimator']
+	'BusinessOpenEstimator', 'UserStarsDistributionEstimator']
 
 
 class ReviewLengthEstimator(BaseEstimator):
@@ -466,5 +466,39 @@ class BusinessOpenEstimator(BaseEstimator):
 		for review in X:
 			business = self.data.get_business_for_review(review)
 			feature = float(business['open'])
+			feature_matrix.append([feature])
+		return feature_matrix
+
+
+class UserStarsDistributionEstimator(BaseEstimator):
+	"""
+	Gives a score that characterizes the distribution of a user's stars in the 5 possible
+	bins.
+	"""
+
+	def __init__(self, data=None):
+		self.data = data
+
+	def fit(self, X, y):
+		user_review_stars = defaultdict(Counter)
+		for review in self.data.all_reviews().values():
+			user_review_stars[review['user_id']].update([review['stars']])
+
+		self.user_stars_distribution = {}
+		for user_id, stars_counter in user_review_stars.iteritems():
+			total_count = sum(stars_counter.values())
+			# reviews can be grouped in exactly 5 bins by their stars
+			bins_count = 5
+			average_bin_size = float(total_count) / bins_count
+			bins_deviation = [abs(stars_counter[i] - average_bin_size) 
+								for i in range(1, bins_count + 1)]
+			score = sum(bins_deviation) / total_count
+			self.user_stars_distribution[user_id] = score
+		return self
+
+	def transform(self, X):
+		feature_matrix = []
+		for review in X:
+			feature = self.user_stars_distribution[review['user_id']]
 			feature_matrix.append([feature])
 		return feature_matrix

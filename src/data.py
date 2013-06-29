@@ -80,3 +80,9 @@ class Data(object):
 
 	def get_business_for_review(self, review):
 		return self.businesses[review['business_id']]
+
+	def all_reviews(self):
+		all_reviews = {}
+		all_reviews.update(self.training_reviews)
+		all_reviews.update(self.test_reviews)
+		return all_reviews

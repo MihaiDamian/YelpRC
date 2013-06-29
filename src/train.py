@@ -48,6 +48,7 @@ if __name__ == "__main__":
 									('rev_length', ReviewLengthEstimator()),
 									('exclamations', PunctuationEstimator('!')),
 									('questions', PunctuationEstimator('?')),
+									('user_stars_distribution', UserStarsDistributionEstimator(data)),
 									])
 
 	pipeline = Pipeline([('features', feature_union),
