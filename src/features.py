@@ -12,16 +12,16 @@ from pos_vectorize import loadData
 from sentimentAnalysis import SentimentClassifier
 
 
-__all__ = ['ReviewLengthEstimator', 'UnigramEstimator', 'UserReviewCountEstimator', 
-	'SentenceCountEstimator', 'AverageSentenceLengthEstimator', 'ParagraphCountEstimator',
-	'POSPipleline', 'SentimentEstimator', 'BusinessReviewCountEstimator', 'WinnerBiasEstimator',
-	'ReviewAgeEstimator', 'AverageParagraphLength', 'CheckinsCountEstimator', 
-	'BusinessCategoriesEstimator', 'TimeCompetitionEstimator', 'UserUsefulVotesEstimator',
-	'UserFunnyVotesEstimator', 'UserCoolVotesEstimator', 'PunctuationEstimator',
-	'BusinessOpenEstimator', 'UserStarsDistributionEstimator']
+__all__ = ['ReviewLengthFeature', 'UnigramFeature', 'UserReviewCountFeature', 
+	'SentenceCountFeature', 'AverageSentenceLengthFeature', 'ParagraphCountFeature',
+	'POSFeature', 'SentimentFeature', 'BusinessReviewCountFeature', 'WinnerBiasFeature',
+	'ReviewAgeFeature', 'AverageParagraphLengthFeature', 'CheckinsCountFeature', 
+	'BusinessCategoriesFeature', 'TimeCompetitionFeature', 'UserUsefulVotesFeature',
+	'UserFunnyVotesFeature', 'UserCoolVotesFeature', 'PunctuationFeature',
+	'BusinessOpenFeature', 'UserStarsDistributionFeature']
 
 
-class ReviewLengthEstimator(BaseEstimator):
+class ReviewLengthFeature(BaseEstimator):
 
 	def fit(self, X, y):
 		return self
@@ -46,10 +46,10 @@ class ReviewTextTransformer(BaseEstimator):
 		return review_texts
 
 
-class UnigramEstimator(Pipeline):
+class UnigramFeature(Pipeline):
 
 	def __init__(self):
-		super(UnigramEstimator, self).__init__([('review_text', ReviewTextTransformer()),
+		super(UnigramFeature, self).__init__([('review_text', ReviewTextTransformer()),
 												('hash_vect', HashingVectorizer()), 
 												('tfidf', TfidfTransformer()),
 												])
@@ -57,10 +57,9 @@ class UnigramEstimator(Pipeline):
 		self.set_params(hash_vect__norm=None, hash_vect__non_negative=True)
 
 
-class UserReviewCountEstimator(BaseEstimator):
+class UserReviewCountFeature(BaseEstimator):
 
 	def __init__(self, data):
-		super(UserReviewCountEstimator, self).__init__()
 		self.data = data
 
 	def fit(self, X, y):
@@ -79,7 +78,7 @@ class UserReviewCountEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class SentenceCountEstimator(BaseEstimator):
+class SentenceCountFeature(BaseEstimator):
 
 	def fit(self, X, y):
 		return self
@@ -92,7 +91,7 @@ class SentenceCountEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class AverageSentenceLengthEstimator(BaseEstimator):
+class AverageSentenceLengthFeature(BaseEstimator):
 
 	def fit(self, X, y):
 		return self
@@ -110,7 +109,7 @@ class AverageSentenceLengthEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class ParagraphCountEstimator(BaseEstimator):
+class ParagraphCountFeature(BaseEstimator):
 
 	def fit(self, X, y):
 		return self
@@ -123,7 +122,7 @@ class ParagraphCountEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class AverageParagraphLength(BaseEstimator):
+class AverageParagraphLengthFeature(BaseEstimator):
 
 	def fit(self, X, y):
 		return self
@@ -179,7 +178,7 @@ class POSSelector(BaseEstimator):
 		return feature_matrix
 
 
-class POSPipleline(Pipeline):
+class POSFeature(Pipeline):
 	"""
 	The most promising tags were:
 	',', 'CC', 'CD', 'DT', 'IN', 'MD', 'NNS', 'PRP', 'PRP$', 'RP', 'TO', 'VB', 'VBD', 'VBG', 'WRB'
@@ -195,14 +194,14 @@ class POSPipleline(Pipeline):
 
 
 	def __init__(self):
-		super(POSPipleline, self).__init__([('pos', POSEstimator()), 
+		super(POSFeature, self).__init__([('pos', POSEstimator()), 
 											('tfidf', TfidfTransformer()),
 											('pos_select', POSSelector())])
-		self.set_params(pos__pos_data=POSPipleline.pos_data(), 
-						pos_select__pos_data=POSPipleline.pos_data())
+		self.set_params(pos__pos_data=POSFeature.pos_data(), 
+						pos_select__pos_data=POSFeature.pos_data())
 
 
-class SentimentEstimator(BaseEstimator):
+class SentimentFeature(BaseEstimator):
 
 	__classifier = None
 
@@ -225,7 +224,7 @@ class SentimentEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class BusinessReviewCountEstimator(BaseEstimator):
+class BusinessReviewCountFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -242,7 +241,7 @@ class BusinessReviewCountEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class WinnerBiasEstimator(BaseEstimator):
+class WinnerBiasFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -275,7 +274,7 @@ class WinnerBiasEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class ReviewAgeEstimator(BaseEstimator):
+class ReviewAgeFeature(BaseEstimator):
 
 	def fit(self, X, y):
 		return self
@@ -290,7 +289,7 @@ class ReviewAgeEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class CheckinsCountEstimator(BaseEstimator):
+class CheckinsCountFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -311,7 +310,7 @@ class CheckinsCountEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class BusinessCategoriesEstimator(BaseEstimator):
+class BusinessCategoriesFeature(BaseEstimator):
 	"""
 	WARNING
 	Works only with a modified version of LabelBinarizer
@@ -339,7 +338,7 @@ class BusinessCategoriesEstimator(BaseEstimator):
 		return binarized_labels.astype(float)
 
 
-class TimeCompetitionEstimator(BaseEstimator):
+class TimeCompetitionFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -372,7 +371,7 @@ class TimeCompetitionEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class UserUsefulVotesEstimator(BaseEstimator):
+class UserUsefulVotesFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -393,7 +392,7 @@ class UserUsefulVotesEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class UserFunnyVotesEstimator(BaseEstimator):
+class UserFunnyVotesFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -414,7 +413,7 @@ class UserFunnyVotesEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class UserCoolVotesEstimator(BaseEstimator):
+class UserCoolVotesFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -435,7 +434,7 @@ class UserCoolVotesEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class PunctuationEstimator(BaseEstimator):
+class PunctuationFeature(BaseEstimator):
 
 	def __init__(self, sign=None):
 		self.sign = sign
@@ -453,7 +452,7 @@ class PunctuationEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class BusinessOpenEstimator(BaseEstimator):
+class BusinessOpenFeature(BaseEstimator):
 
 	def __init__(self, data=None):
 		self.data = data
@@ -470,7 +469,7 @@ class BusinessOpenEstimator(BaseEstimator):
 		return feature_matrix
 
 
-class UserStarsDistributionEstimator(BaseEstimator):
+class UserStarsDistributionFeature(BaseEstimator):
 	"""
 	Gives a score that characterizes the distribution of a user's stars in the 5 possible
 	bins.

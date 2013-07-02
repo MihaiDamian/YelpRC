@@ -8,7 +8,7 @@ import pylab
 import numpy
 
 from data import Data
-from estimators import *
+from features import *
 
 
 def score(actual, prediction):
@@ -39,16 +39,16 @@ if __name__ == "__main__":
 	# There is a bug in joblib that prevents us from spawning multiple jobs.
 	# Paralelizing these features seems to work slower for now anyway.
 	feature_union = FeatureUnion([
-									('user_cool_votes', UserCoolVotesEstimator(data)),
-									('user_funny_votes', UserFunnyVotesEstimator(data)),
-									('user_useful_votes', UserUsefulVotesEstimator(data)),
-									('review_age', ReviewAgeEstimator()),
-									('paragraphs_count', ParagraphCountEstimator()),
-									('user_review_count', UserReviewCountEstimator(data)),
-									('rev_length', ReviewLengthEstimator()),
-									('exclamations', PunctuationEstimator('!')),
-									('questions', PunctuationEstimator('?')),
-									('user_stars_distribution', UserStarsDistributionEstimator(data)),
+									('user_cool_votes', UserCoolVotesFeature(data)),
+									('user_funny_votes', UserFunnyVotesFeature(data)),
+									('user_useful_votes', UserUsefulVotesFeature(data)),
+									('review_age', ReviewAgeFeature()),
+									('paragraphs_count', ParagraphCountFeature()),
+									('user_review_count', UserReviewCountFeature(data)),
+									('rev_length', ReviewLengthFeature()),
+									('exclamations', PunctuationFeature('!')),
+									('questions', PunctuationFeature('?')),
+									('user_stars_distribution', UserStarsDistributionFeature(data)),
 									])
 
 	pipeline = Pipeline([('features', feature_union),
