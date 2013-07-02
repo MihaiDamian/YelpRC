@@ -6,6 +6,11 @@ import cPickle
 from data import Data
 
 
+"""
+This module does POS tagging on the entire data set and pickles the result.
+"""
+
+
 DATA_PATH = '../derivedData/posVectorizedReviews.pkl'
 
 

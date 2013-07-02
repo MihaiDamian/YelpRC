@@ -22,6 +22,9 @@ __all__ = ['ReviewLengthFeature', 'UnigramFeature', 'UserReviewCountFeature',
 
 
 class ReviewLengthFeature(BaseEstimator):
+	"""
+	The length in characters in each review.
+	"""
 
 	def fit(self, X, y):
 		return self
@@ -47,6 +50,10 @@ class ReviewTextTransformer(BaseEstimator):
 
 
 class UnigramFeature(Pipeline):
+	"""
+	Constructs a feature matrix where each column represents a separate unigram. The values
+	are the tfidfs of the unigrams in the context of each review.
+	"""
 
 	def __init__(self):
 		super(UnigramFeature, self).__init__([('review_text', ReviewTextTransformer()),
@@ -58,6 +65,9 @@ class UnigramFeature(Pipeline):
 
 
 class UserReviewCountFeature(BaseEstimator):
+	"""
+	The number of reviews written by each review's user
+	"""
 
 	def __init__(self, data):
 		self.data = data
@@ -79,6 +89,9 @@ class UserReviewCountFeature(BaseEstimator):
 
 
 class SentenceCountFeature(BaseEstimator):
+	"""
+	The number of sentences in each review.
+	"""
 
 	def fit(self, X, y):
 		return self
@@ -92,6 +105,10 @@ class SentenceCountFeature(BaseEstimator):
 
 
 class AverageSentenceLengthFeature(BaseEstimator):
+	"""
+	The average length of sentences in each reviews. Sentence length is given by
+	character count.
+	"""
 
 	def fit(self, X, y):
 		return self
@@ -110,6 +127,9 @@ class AverageSentenceLengthFeature(BaseEstimator):
 
 
 class ParagraphCountFeature(BaseEstimator):
+	"""
+	The number of paragraphs in each review.
+	"""
 
 	def fit(self, X, y):
 		return self
@@ -117,12 +137,16 @@ class ParagraphCountFeature(BaseEstimator):
 	def transform(self, X):
 		feature_matrix = []
 		for review in X:
+			# TODO: make this not count successive line splits
 			paragraphs = float(len(review['text'].splitlines()))
 			feature_matrix.append([paragraphs])
 		return feature_matrix
 
 
 class AverageParagraphLengthFeature(BaseEstimator):
+	"""
+	Average paragraph length, in characters, of each review.
+	"""
 
 	def fit(self, X, y):
 		return self
@@ -130,6 +154,7 @@ class AverageParagraphLengthFeature(BaseEstimator):
 	def transform(self, X):
 		feature_matrix = []
 		for review in X:
+			# TODO: make this not count successive line splits
 			paragraph_count = len(review['text'].splitlines())
 			if paragraph_count > 0:
 				average_length = float(len(review['text']) / float(paragraph_count))
@@ -180,8 +205,8 @@ class POSSelector(BaseEstimator):
 
 class POSFeature(Pipeline):
 	"""
-	The most promising tags were:
-	',', 'CC', 'CD', 'DT', 'IN', 'MD', 'NNS', 'PRP', 'PRP$', 'RP', 'TO', 'VB', 'VBD', 'VBG', 'WRB'
+	This feature constructs a matrix where items represent the relative frequency of review parts
+	of speech vs dataset parts of speech.
 	"""
 
 	__pos_data = None
@@ -202,6 +227,9 @@ class POSFeature(Pipeline):
 
 
 class SentimentFeature(BaseEstimator):
+	"""
+	This feature characterizes the relative sentiment of a review. See SentimentClassifier.
+	"""
 
 	__classifier = None
 
@@ -225,6 +253,9 @@ class SentimentFeature(BaseEstimator):
 
 
 class BusinessReviewCountFeature(BaseEstimator):
+	"""
+	The number of reviews each review's business has received.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
@@ -242,6 +273,10 @@ class BusinessReviewCountFeature(BaseEstimator):
 
 
 class WinnerBiasFeature(BaseEstimator):
+	"""
+	This feature attempts to give a per-business score that characterizes the imbalance in number
+	of votes between the upper crust of best rated reviews vs the rest.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
@@ -275,6 +310,11 @@ class WinnerBiasFeature(BaseEstimator):
 
 
 class ReviewAgeFeature(BaseEstimator):
+	"""
+	The age of the review in relation to the given snapshot dates. The snapshot dates were injected
+	on data read. The review date is deliberatly taken as a reliable indicator of the review's age,
+	ignoring the fact that the review may not have been publicly visible from that moment.
+	"""
 
 	def fit(self, X, y):
 		return self
@@ -290,6 +330,9 @@ class ReviewAgeFeature(BaseEstimator):
 
 
 class CheckinsCountFeature(BaseEstimator):
+	"""
+	A per business feature that counts the number of checkins.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
@@ -312,8 +355,10 @@ class CheckinsCountFeature(BaseEstimator):
 
 class BusinessCategoriesFeature(BaseEstimator):
 	"""
-	WARNING
-	Works only with a modified version of LabelBinarizer
+	WARNING!!!
+	Works only with a modified version of LabelBinarizer.
+
+	A binarization of the reviews' business categories.
 	"""
 
 	def __init__(self, data=None):
@@ -339,6 +384,10 @@ class BusinessCategoriesFeature(BaseEstimator):
 
 
 class TimeCompetitionFeature(BaseEstimator):
+	"""
+	This feature represents the time distance between each review and the closest in time review
+	for the same business.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
@@ -372,6 +421,9 @@ class TimeCompetitionFeature(BaseEstimator):
 
 
 class UserUsefulVotesFeature(BaseEstimator):
+	"""
+	The number of useful votes received by the review's user.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
@@ -393,6 +445,9 @@ class UserUsefulVotesFeature(BaseEstimator):
 
 
 class UserFunnyVotesFeature(BaseEstimator):
+	"""
+	The number of funny votes received by the review's user.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
@@ -414,6 +469,9 @@ class UserFunnyVotesFeature(BaseEstimator):
 
 
 class UserCoolVotesFeature(BaseEstimator):
+	"""
+	The number of cool votes received by the review's user.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
@@ -435,6 +493,10 @@ class UserCoolVotesFeature(BaseEstimator):
 
 
 class PunctuationFeature(BaseEstimator):
+	"""
+	A template feature that counts the number of occurrences of the input punctuation sign 
+	in a review, weighted by the review length.
+	"""
 
 	def __init__(self, sign=None):
 		self.sign = sign
@@ -453,6 +515,9 @@ class PunctuationFeature(BaseEstimator):
 
 
 class BusinessOpenFeature(BaseEstimator):
+	"""
+	A binary feature that describes the review's business open status.
+	"""
 
 	def __init__(self, data=None):
 		self.data = data
